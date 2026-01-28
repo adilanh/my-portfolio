@@ -722,7 +722,7 @@ function Contact() {
 
             <form
               className="mt-6 grid gap-3"
-              action="https://formspree.io/f/xpqdgknb"
+              action="https://formspree.io/f/xwvoddnw"
               method="POST"
               onSubmit={handleSubmit}
             >
