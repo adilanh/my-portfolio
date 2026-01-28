@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
-};
-
-export default nextConfig;
+const nextConfig = {
+    output: "export",
+    images: { unoptimized: true },
+    basePath: "/my-portfolio", // aktifkan kalau project page
+  };
+  export default nextConfig;
