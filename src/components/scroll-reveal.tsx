@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 type Variant = "lift" | "zoom" | "slide-left" | "slide-right" | "flip";
 
@@ -43,7 +43,7 @@ export default function ScrollReveal({
     return () => obs.disconnect();
   }, [once]);
 
-  const { hidden, show } = useMemo(() => {
+  const variants = useMemo<Variants>(() => {
     if (reduce) {
       return {
         hidden: { opacity: 0 },
@@ -61,7 +61,7 @@ export default function ScrollReveal({
       transition: {
         duration: 0.85,
         delay,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     };
 
@@ -70,7 +70,7 @@ export default function ScrollReveal({
       transition: {
         duration: 0.9,
         delay,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     };
 
@@ -130,7 +130,7 @@ export default function ScrollReveal({
       variants={stagger ? container : undefined}
       style={{ transformPerspective: 1000 }}
     >
-      <motion.div variants={!stagger ? { hidden, show } : undefined} initial={false}>
+      <motion.div variants={!stagger ? variants : undefined} initial={false}>
         {children}
       </motion.div>
     </motion.div>
