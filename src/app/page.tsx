@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import ScrollReveal from "@/components/scroll-reveal";
+import ParallaxSection from "@/components/parallax-section";
+import MagneticButton from "@/components/magnetic-button";
+import CursorGlow from "@/components/cursor-glow";
+import GalaxyAmbient from "@/components/galaxy-ambient";
+import ScrollProgress from "@/components/scroll-progress";
 
 const NAV = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
-  { label: "Contact", href: "#contact" },
 ];
 
 type Project = {
@@ -17,9 +22,17 @@ type Project = {
   tag: string;
   desc: string;
   longDesc: string;
+  role: string;
+  type: string;
+  year: string;
+  highlights: string[];
+  problem: string;
+  solution: string;
+  decisions: string[];
+  outcome: string;
   stack: string[];
-  demoVideo?: string; // mp4/webm url
-  poster?: string; // image url
+  demoVideo?: string;
+  poster?: string;
   github?: string;
   live?: string;
   details?: string;
@@ -35,9 +48,23 @@ const PROJECTS: Project[] = [
     desc: "Role-based management for incoming/outgoing letters with fast search and monthly reports.",
     longDesc:
       "Administrative archiving system that streamlines institutional correspondence workflows. Includes role-based access, searchable archives, structured metadata, and periodic reporting to support operational accountability.",
+    role: "Frontend / System Design",
+    type: "Institutional System",
+    year: "2025",
+    highlights: ["Role-based access control (RBAC)", "Fast archive search & reporting", "Structured document workflow"],
+    problem: "Manual archiving caused duplication, slow retrieval, and reporting delays for institutional correspondence.",
+    solution:
+      "Built a role-based dashboard with structured workflows for incoming/outgoing letters, searchable archives, and report-ready data.",
+    decisions: [
+      "RBAC to separate admin and staff permissions",
+      "REST API for predictable integration",
+      "Search-first UX for fast retrieval",
+      "Report queries optimized for monthly summaries",
+    ],
+    outcome: "Faster lookup, clearer accountability, and a repeatable reporting flow.",
     stack: ["React", "TypeScript", "Tailwind", "REST API", "MySQL"],
     demoVideo: "/demo/siantar.mp4",
-    poster: "/demo/siantar-poster.jpg",
+    poster: "/demo/siantar.jpeg",
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -50,9 +77,17 @@ const PROJECTS: Project[] = [
     desc: "Interactive coffee map with filters, listing, and simple location insights.",
     longDesc:
       "GIS-based experience that combines map interactions (markers, popups) with searchable listings and category filters. Built to support exploration and lightweight location analysis.",
+    role: "Frontend / Data Visualization",
+    type: "Spatial Data App",
+    year: "2025",
+    highlights: ["Interactive map + filters", "GeoJSON-driven data layer", "Synced list & map state"],
+    problem: "Local coffee data was scattered, making it hard to see distribution patterns and nearby options.",
+    solution: "Mapped coffee locations with filters and listings to enable spatial exploration and quick insights.",
+    decisions: ["Leaflet for lightweight, interactive maps", "GeoJSON for structured spatial data", "Filterable listing synced to map state"],
+    outcome: "Clearer location coverage and easier discovery by area or category.",
     stack: ["React", "Leaflet", "GeoJSON"],
     demoVideo: "/demo/coffeepahoman.mp4",
-    poster: "/demo/coffeepahoman-poster.jpg",
+    poster: "/demo/coffeepahoman.jpeg",
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -65,9 +100,17 @@ const PROJECTS: Project[] = [
     desc: "Rule-based expert system to diagnose cocoa diseases and recommend treatments.",
     longDesc:
       "Expert system that identifies cocoa plant diseases using rule-based inference from observable symptoms and provides recommendation outputs. Designed for clarity, explainability, and practical guidance.",
+    role: "System Design / AI Logic",
+    type: "Decision Support",
+    year: "2025",
+    highlights: ["Explainable rule-based inference", "Symptom-driven inputs", "Actionable treatment outputs"],
+    problem: "Farmers struggled to identify plant diseases accurately from visible symptoms.",
+    solution: "Implemented an explainable expert system that maps symptoms to diagnoses and treatment guidance.",
+    decisions: ["Rule-based inference for transparency", "Symptom-driven input flow", "Explainable outputs over black-box ML"],
+    outcome: "Clear decision support that is easy to validate and trust in the field.",
     stack: ["Python", "Expert System", "Rule-based AI"],
     demoVideo: "/demo/noka.mp4",
-    poster: "/demo/noka-poster.jpg",
+    poster: "/demo/noka.jpeg",
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -80,9 +123,17 @@ const PROJECTS: Project[] = [
     desc: "Photo upload + rating + leaderboard with authentication for engagement.",
     longDesc:
       "Interactive platform where users can upload photos, receive ratings, and view rankings. Built as a UX exploration project with authentication and basic engagement mechanics.",
+    role: "Frontend / Product UX",
+    type: "Interactive Platform",
+    year: "2025",
+    highlights: ["Auth + protected uploads", "Ratings & leaderboard loop", "Engagement-driven UX"],
+    problem: "Static galleries lacked engagement and clear feedback loops for contributors.",
+    solution: "Built an interactive platform with auth, uploads, ratings, and leaderboards to drive participation.",
+    decisions: ["Authentication to protect submissions", "Ratings to create feedback loops", "Leaderboard for lightweight gamification"],
+    outcome: "Higher engagement through clear user flows and visible outcomes.",
     stack: ["React", "Firebase", "Auth"],
     demoVideo: "/demo/piccrown.mp4",
-    poster: "/demo/piccrown-poster.jpg",
+    poster: "/demo/piccrown.jpeg",
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -95,6 +146,99 @@ const SKILLS = [
   { group: "Machine Learning / Data Science", items: ["Python", "Pandas", "scikit-learn", "TensorFlow/Keras"] },
   { group: "Tools", items: ["Git/GitHub", "Figma", "Postman", "Docker (basic)"] },
 ];
+
+const WRITINGS = [
+  { title: "From Raw Data to Decision Support", outlet: "Medium", href: "#" },
+  { title: "Building Explainable ML Pipelines", outlet: "LinkedIn", href: "#" },
+  { title: "Designing Admin Systems with RBAC", outlet: "Blog", href: "#" },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: "Adila delivers structured workflows with clear documentation. The reporting output was easy to adopt.",
+    author: "Project Stakeholder",
+    role: "Institutional Client",
+  },
+  {
+    quote: "Strong attention to UX details and consistent UI systems. Communicates progress clearly.",
+    author: "Collaborator",
+    role: "Team Member",
+  },
+];
+
+const SKILL_ICONS: Record<string, React.ReactNode> = {
+  React: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <circle cx="12" cy="12" r="1.6" />
+      <ellipse cx="12" cy="12" rx="9" ry="3.6" />
+      <ellipse cx="12" cy="12" rx="3.6" ry="9" transform="rotate(60 12 12)" />
+      <ellipse cx="12" cy="12" rx="3.6" ry="9" transform="rotate(-60 12 12)" />
+    </svg>
+  ),
+  TypeScript: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" />
+      <path d="M8 10h4M10 10v6M15 10h2.5c1.2 0 1.8.6 1.8 1.4 0 .8-.6 1.4-1.8 1.4h-2.5v3" />
+    </svg>
+  ),
+  Python: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M7 9a4 4 0 0 1 4-4h4a3 3 0 0 1 3 3v4h-6a4 4 0 0 1-4-4z" />
+      <circle cx="11" cy="7.5" r="0.8" />
+      <path d="M17 15a4 4 0 0 1-4 4H9a3 3 0 0 1-3-3v-4h6a4 4 0 0 1 4 4z" />
+      <circle cx="13" cy="16.5" r="0.8" />
+    </svg>
+  ),
+  Tailwind: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M5 12c1.6-2 3.6-3 6-3 2.4 0 4 1 5.2 3 1.1 2 2.8 3 5.8 3" />
+      <path d="M2 12c1.6 2 3.6 3 6 3 2.4 0 4-1 5.2-3 1.1-2 2.8-3 5.8-3" />
+    </svg>
+  ),
+  "Node.js (basic)": (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M12 2.8 20 7.3v9.4l-8 4.5-8-4.5V7.3z" />
+      <path d="M9.5 9.5h3.2c1.5 0 2.3.8 2.3 2 0 1.2-.8 2-2.3 2H9.5z" />
+    </svg>
+  ),
+  "Git/GitHub": (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <circle cx="6" cy="6" r="2.2" />
+      <circle cx="18" cy="6" r="2.2" />
+      <circle cx="12" cy="18" r="2.2" />
+      <path d="M8 7.5l3.5 8M16 7.5l-3.5 8" />
+    </svg>
+  ),
+  Figma: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M9 3h6a3 3 0 1 1 0 6H9z" />
+      <path d="M9 9h6a3 3 0 1 1 0 6H9z" />
+      <path d="M9 15h6a3 3 0 1 1 0 6H9z" />
+      <path d="M9 3a3 3 0 1 0 0 6" />
+      <path d="M9 9a3 3 0 1 0 0 6" />
+    </svg>
+  ),
+  Docker: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M3 13h18c0 4-3.5 7-8 7H9c-3.3 0-6-2.7-6-6z" />
+      <path d="M6 10h3v3H6zM10 10h3v3h-3zM14 10h3v3h-3zM10 6h3v3h-3z" />
+    </svg>
+  ),
+  MySQL: (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M6 9c0-2.2 2.7-4 6-4s6 1.8 6 4-2.7 4-6 4-6-1.8-6-4z" />
+      <path d="M6 9v6c0 2.2 2.7 4 6 4s6-1.8 6-4V9" />
+    </svg>
+  ),
+  "REST API": (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <path d="M4 7h6M4 12h10M4 17h8" />
+      <circle cx="18" cy="7" r="2" />
+      <circle cx="20" cy="12" r="2" />
+      <circle cx="18" cy="17" r="2" />
+    </svg>
+  ),
+};
 
 function cn(...parts: Array<string | undefined | false>) {
   return parts.filter(Boolean).join(" ");
@@ -114,9 +258,7 @@ function GlowBg() {
           const x = (i * 97) % 1200;
           const y = (i * 151) % 900;
           const r = (i % 3) + 0.8;
-          return (
-            <circle key={i} cx={x} cy={y} r={r} fill="white" opacity={(i % 10) / 15 + 0.15} />
-          );
+          return <circle key={i} cx={x} cy={y} r={r} fill="white" opacity={(i % 10) / 15 + 0.15} />;
         })}
       </svg>
     </div>
@@ -175,6 +317,66 @@ function Button({
   );
 }
 
+function SkillBadge({ label }: { label: string }) {
+  const abbr = label
+    .replace(/[^\w]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 transition hover:-translate-y-0.5 hover:border-white/20">
+      <span className="grid h-5 w-5 place-items-center rounded-full border border-white/15 bg-white/10 text-[10px] font-semibold text-white/80">
+        {SKILL_ICONS[label] ?? abbr}
+      </span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
+function ActionButton({
+  children,
+  variant = "primary",
+  onClick,
+}: {
+  children: React.ReactNode;
+  variant?: "primary" | "ghost";
+  onClick?: () => void;
+}) {
+  const base =
+    "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[0.98]";
+  const styles =
+    variant === "primary"
+      ? "bg-gradient-to-r from-fuchsia-400 to-indigo-400 text-slate-950 hover:brightness-110"
+      : "border border-white/12 bg-white/5 text-white/90 hover:bg-white/10";
+  return (
+    <button type="button" onClick={onClick} className={cn(base, styles)}>
+      {children}
+    </button>
+  );
+}
+
+function Marquee({ items }: { items: string[] }) {
+  const doubled = [...items, ...items];
+  return (
+    <div className="marquee">
+      <div className="marquee-track">
+        {doubled.map((item, idx) => (
+          <span
+            key={`${item}-${idx}`}
+            className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80"
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Navbar() {
   return (
     <div className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
@@ -210,6 +412,159 @@ function Navbar() {
   );
 }
 
+/* ======================
+   TOP BANNER (FULL WIDTH)
+====================== */
+
+function TopBanner() {
+  const name = "ADILANH";
+
+  // deterministic stars (no random on re-render)
+  const stars = useMemo(() => {
+    return Array.from({ length: 28 }).map((_, i) => {
+      const x = ((i * 73) % 1000) / 10; // 0..100
+      const y = ((i * 191) % 1000) / 10;
+      const s = 0.55 + ((i * 29) % 100) / 170;
+      const d = ((i * 17) % 100) / 10;
+      const v = 10 + ((i * 13) % 100) / 3;
+      const cyan = i % 3 === 0;
+      return { x, y, s, d, v, cyan };
+    });
+  }, []);
+
+  const [hideScrollCue, setHideScrollCue] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      // hide setelah scroll turun dikit
+      setHideScrollCue(window.scrollY > 60);
+    };
+
+    onScroll(); // set initial
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const container = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+  };
+
+  const letter = {
+    hidden: { opacity: 0, x: 46, y: 0, filter: "blur(12px)" },
+    show: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 1.25, ease: [0.12, 0.95, 0.2, 1] },
+    },
+  };
+
+  return (
+    <section className="relative overflow-hidden border-b border-white/10">
+      <div className="intro-wrap intro-wrap--tall relative">
+        {/* soft fairy veil */}
+        <div aria-hidden className="intro-veil" />
+
+        {/* stars + shooting */}
+        <div aria-hidden className="intro-stars">
+          {stars.map((st, idx) => (
+            <span
+              key={idx}
+              className={cn("intro-star", st.cyan && "intro-star--cyan")}
+              style={
+                {
+                  left: `${st.x}%`,
+                  top: `${st.y}%`,
+                  transform: `scale(${st.s})`,
+                  animationDelay: `${st.d}s`,
+                  animationDuration: `${st.v}s`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+          <span className="intro-shoot" style={{ left: "12%", top: "18%" } as React.CSSProperties} />
+          <span className="intro-shoot intro-shoot--2" style={{ left: "58%", top: "10%" } as React.CSSProperties} />
+          <span className="intro-shoot intro-shoot--3" style={{ left: "78%", top: "26%" } as React.CSSProperties} />
+        </div>
+
+        {/* content */}
+        <div className="relative z-[2] mx-auto h-full min-h-[calc(100vh-76px)] max-w-6xl px-5 pt-[14vh]">
+          {/* CENTER BLOCK (judul + subtitle) */}
+          <div className="intro-content">
+            <motion.div initial="hidden" animate="show" variants={container} className="relative">
+              <div aria-hidden className="intro-glow intro-glow--fairy" />
+
+              <motion.h1
+                className="intro-title font-display font-extrabold tracking-[0.55em] text-white"
+                style={{ paddingLeft: "0.55em" }}
+              >
+              {name.split("").map((ch, i) => {
+                const isI = i === 2;
+
+                return (
+                  <motion.span
+                    key={`${ch}-${i}`}
+                    variants={letter}
+                    data-letter-index={i}
+                    className="intro-letter relative inline-block"
+                    style={{ ["--i" as any]: i } as React.CSSProperties}
+                  >
+                    {ch}
+
+                    {isI && (
+                      <span className="absolute left-1/2 top-[-24px] -translate-x-1/2 translate-x-[2px]">
+                      </span>
+                    )}
+                  </motion.span>
+                );
+              })}
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                className="intro-sub mx-auto text-center"
+              >
+                <span className="block">
+                  Software Machine Learning Data Systems Clean UI, real workflows, measurable outcomes.
+                </span>
+              </motion.p>
+            </motion.div>
+          </div>
+
+          {/* SCROLL (SELALU DI BAWAH) */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={
+              hideScrollCue
+                ? { opacity: 0, y: 14, pointerEvents: "none" }
+                : { opacity: 1, y: 0, pointerEvents: "auto" }
+            }
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="intro-scroll intro-scroll--bottom"
+          >
+            <div className="text-xs font-semibold tracking-wider text-white/60">SCROLL TO EXPLORE</div>
+
+            <a href="#home" className="scroll-cue" aria-label="Scroll to content">
+              <span className="scroll-cue__dot" />
+              <svg viewBox="0 0 24 24" className="scroll-cue__arrow" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ======================
+   HERO (your existing)
+====================== */
+
 function Hero() {
   return (
     <section id="home" className="relative">
@@ -226,17 +581,16 @@ function Hero() {
             </h1>
 
             <h2 className="mt-2 font-display text-2xl font-semibold text-white md:text-3xl">
-              Software Developer focused on{" "}
-              <span className="text-fuchsia-300">Machine Learning</span> &{" "}
+              Software Developer focused on <span className="text-fuchsia-300">Machine Learning</span> &{" "}
               <span className="text-cyan-300">Data Science</span>
             </h2>
 
-            <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-white/75 md:text-base">
-              I design and build clean, scalable web applications with a focus on data-driven workflows.
-              My work spans software development, ML experimentation, and practical analytics systems.
+            <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-white/85 md:text-base">
+              I design and build clean, scalable web applications with a focus on data-driven workflows. My work spans
+              software development, ML experimentation, and practical analytics systems.
             </p>
 
-            <div className="mt-5 grid gap-2 text-sm text-white/70 sm:grid-cols-2">
+            <div className="mt-5 grid gap-2 text-sm text-white/80 sm:grid-cols-2">
               {[
                 "UI implementation with consistent systems",
                 "Role-based apps, search, and reporting",
@@ -251,11 +605,16 @@ function Hero() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button href="#projects" variant="primary">
-                View Projects
-              </Button>
+              <MagneticButton>
+                <Button href="#projects" variant="primary">
+                  View Projects
+                </Button>
+              </MagneticButton>
               <Button href="#about" variant="ghost">
                 About Me
+              </Button>
+              <Button href="/resume.pdf" variant="ghost">
+                Download CV
               </Button>
             </div>
           </Glass>
@@ -278,13 +637,13 @@ function Hero() {
                   <div className="mt-1 text-xs text-white/60">SIANTAR — Case Study</div>
 
                   <div className="mt-4 grid gap-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                       <div className="text-xs text-white/60">What I delivered</div>
                       <div className="mt-1 text-sm font-semibold text-white">
                         Dashboard UI, role-based access, search, monthly reports
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                       <div className="text-xs text-white/60">Design approach</div>
                       <div className="mt-1 text-sm font-semibold text-white">
                         Clear layout, consistent components, and practical workflows
@@ -311,21 +670,23 @@ function Hero() {
                   </span>
                 </div>
 
-                <div className="mt-4 grid gap-3 text-sm text-white/70">
-                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="mt-4 grid gap-3 text-sm text-white/75">
+                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
                     <span>Focus</span>
                     <span className="text-white/90">Product UI + Data Systems</span>
                   </div>
-                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
                     <span>Tools</span>
                     <span className="text-white/90">React, TypeScript, Python</span>
                   </div>
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button href="#contact" variant="primary">
-                    Get in touch
-                  </Button>
+                  <MagneticButton>
+                    <Button href="#contact" variant="primary">
+                      Get in touch
+                    </Button>
+                  </MagneticButton>
                   <Button href="#projects" variant="ghost">
                     See work
                   </Button>
@@ -346,12 +707,11 @@ function About() {
         <div className="md:col-span-5">
           <Glass className="p-7">
             <Pill className="mb-3">About</Pill>
-            <h2 className="font-display text-2xl font-extrabold text-white">Adila Nurul Hidayah</h2>
-            <p className="mt-3 font-body text-sm leading-relaxed text-white/75">
-              I am a Computer Science student with a strong interest in software development,
-              machine learning, and data science. I enjoy building structured, maintainable
-              applications—especially dashboards, administrative systems, and data-driven platforms—
-              while exploring how machine learning can enhance real-world workflows.
+            <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">Adila Nurul Hidayah</h2>
+            <p className="mt-3 font-body text-sm leading-relaxed text-white/85">
+              I am a Computer Science student with a strong interest in software development, machine learning, and data
+              science. I enjoy building structured, maintainable applications—especially dashboards, administrative
+              systems, and data-driven platforms—while exploring how machine learning can enhance real-world workflows.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -401,18 +761,21 @@ function About() {
                   d: "Comfortable with documentation, communication, and iterative development in collaborative work.",
                 },
               ].map((x) => (
-                <div key={x.t} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div
+                  key={x.t}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-6 transition-transform hover:-translate-y-1 hover:border-white/20"
+                >
                   <div className="text-sm font-semibold text-white">{x.t}</div>
-                  <p className="mt-2 text-sm text-white/70">{x.d}</p>
+                  <p className="mt-2 text-sm text-white/80">{x.d}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="text-sm font-semibold text-white">Currently</div>
-              <p className="mt-2 text-sm text-white/70">
-                I&apos;m refining my portfolio and turning projects into concise case studies that
-                clearly communicate goals, implementation choices, and measurable outcomes.
+              <p className="mt-2 text-sm text-white/80">
+                I&apos;m refining my portfolio and turning projects into concise case studies that clearly communicate
+                goals, implementation choices, and measurable outcomes.
               </p>
             </div>
           </Glass>
@@ -423,15 +786,38 @@ function About() {
 }
 
 /* ======================
-   PROJECTS (NEW LAYOUT)
+   PROJECTS (YOUR NEW LAYOUT)
 ====================== */
 
 function Projects() {
   const [active, setActive] = useState(0);
+  const [sidebarTab, setSidebarTab] = useState(0);
+  const [caseOpen, setCaseOpen] = useState(false);
 
   const filtered = PROJECTS;
 
-  // Keep active index valid after filtering
+  useEffect(() => {
+    setSidebarTab(0);
+    setCaseOpen(false);
+  }, [active]);
+
+  useEffect(() => {
+    if (!caseOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [caseOpen]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.caseStudyOpen = caseOpen ? "true" : "false";
+    return () => {
+      delete root.dataset.caseStudyOpen;
+    };
+  }, [caseOpen]);
+
   const safeActive = Math.min(active, Math.max(0, filtered.length - 1));
   const proj = filtered[safeActive] ?? PROJECTS[0];
 
@@ -440,16 +826,11 @@ function Projects() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <Pill className="mb-3">Projects</Pill>
-          <h2 className="font-display text-2xl font-extrabold text-white">Case Studies</h2>
-          <p className="mt-2 font-body text-sm text-white/70">
-            Browse projects from the sidebar, watch the demo, and open the repository.
-          </p>
+          <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">Case Studies</h2>
+          <p className="mt-2 font-body text-sm text-white/80">Browse projects from the sidebar, watch the demo, and open the repository.</p>
         </div>
-
-        
       </div>
 
-      {/* 3-column layout like reference */}
       <div className="mt-6 grid gap-4 lg:grid-cols-12">
         {/* LEFT SIDEBAR */}
         <div className="relative lg:col-span-4 lg:w-[calc(100%-62px)] lg:justify-self-start rounded-3xl border border-white/10 bg-transparent shadow-[0_0_40px_rgba(99,102,241,0.18)]">
@@ -470,7 +851,7 @@ function Projects() {
                       key={p.title}
                       onClick={() => setActive(idx)}
                       className={cn(
-                        "w-full rounded-2xl border p-2 text-left transition",
+                        "w-full rounded-2xl border p-2 text-left transition hover:-translate-y-0.5 hover:border-white/20",
                         isActive
                           ? "border-white/15 bg-gradient-to-r from-indigo-500/25 via-fuchsia-500/15 to-cyan-400/15"
                           : "border-white/10 bg-white/5 hover:bg-white/10"
@@ -493,9 +874,7 @@ function Projects() {
                           <div className="truncate text-xs text-white/60">{p.subtitle ?? p.tag}</div>
 
                           <div className="mt-2 flex items-center gap-2 text-[11px] text-white/60">
-                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">
-                              {p.tag}
-                            </span>
+                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{p.tag}</span>
                             {p.status ? <span className="truncate">{p.status}</span> : null}
                           </div>
                         </div>
@@ -508,7 +887,7 @@ function Projects() {
           </div>
         </div>
 
-        {/* CENTER: VIDEO PREVIEW */}
+        {/* CENTER: VIDEO */}
         <div className="relative lg:col-span-5 lg:ml-[-62px] rounded-3xl border border-white/10 bg-transparent shadow-[0_0_40px_rgba(168,85,247,0.18)]">
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
           <div className="border-b border-white/10 p-4">
@@ -528,8 +907,13 @@ function Projects() {
           </div>
 
           <div className="p-4">
-            <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-              {/* VIDEO */}
+            <motion.div
+              key={proj.title}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5"
+            >
               <video
                 className="h-[360px] w-full object-cover md:h-[420px]"
                 src={proj.demoVideo}
@@ -540,7 +924,6 @@ function Projects() {
                 preload="metadata"
               />
 
-              {/* HOVER OVERLAY */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent opacity-0 transition group-hover:opacity-100" />
 
               <div className="pointer-events-none absolute inset-0 flex items-end justify-between p-4 opacity-0 transition group-hover:opacity-100">
@@ -561,7 +944,7 @@ function Projects() {
                   </Button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="text-xs text-white/60">Summary</div>
@@ -570,42 +953,167 @@ function Projects() {
           </div>
         </div>
 
-        {/* RIGHT SIDEBAR: INSPECT */}
+        {/* RIGHT SIDEBAR */}
         <div className="relative lg:col-span-3 rounded-3xl border border-white/10 bg-transparent shadow-[0_0_40px_rgba(59,130,246,0.18)]">
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
           <div className="border-b border-white/10 p-4">
             <div className="text-xs font-semibold tracking-wider text-white/60">INSPECT</div>
           </div>
 
-          <div className="p-4 space-y-5">
+          <div className="p-4 space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {["Snapshot", "Highlights", "Stack", "Actions"].map((label, idx) => (
+                <button
+                  key={label}
+                  onClick={() => setSidebarTab(idx)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wide transition",
+                    sidebarTab === idx
+                      ? "border-white/20 bg-white/10 text-white"
+                      : "border-white/10 bg-white/5 text-white/60 hover:text-white/90"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+              <div
+                className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ transform: `translateX(-${sidebarTab * 100}%)` }}
+              >
+                <div className="w-full shrink-0 p-4">
+                  <div className="text-xs font-semibold tracking-wider text-white/60">SNAPSHOT</div>
+                  <div className="mt-3 grid gap-2 text-sm text-white/75">
+                    <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="w-14 shrink-0 pt-[2px] text-white/60">Role</span>
+                      <span className="ml-auto max-w-[68%] text-right leading-snug text-white/90">
+                        {proj.role}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-white/60">Type</span>
+                      <span className="text-white/90">{proj.type}</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-white/60">Status</span>
+                      <span className="text-white/90">{proj.status ?? "Completed"}</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-white/60">Year</span>
+                      <span className="text-white/90">{proj.year}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full shrink-0 p-4">
+                  <div className="text-xs font-semibold tracking-wider text-white/60">TECHNICAL HIGHLIGHTS</div>
+                  <div className="mt-3 grid gap-3">
+                    <Marquee items={proj.highlights} />
+                    <div className="text-[11px] text-white/50">Swipe the sidebar tabs to explore.</div>
+                  </div>
+                </div>
+
+                <div className="w-full shrink-0 p-4">
+                  <div className="text-xs font-semibold tracking-wider text-white/60">STACK</div>
+                  <div className="mt-3 grid gap-3">
+                    <Marquee items={proj.stack} />
+                    <div className="text-[11px] text-white/50">Compressed view for quick scanning.</div>
+                  </div>
+                </div>
+
+                <div className="w-full shrink-0 p-4">
+                  <div className="text-xs font-semibold tracking-wider text-white/60">ACTIONS</div>
+                  <div className="mt-3 grid gap-2">
+                    <ActionButton variant="primary" onClick={() => setCaseOpen(true)}>
+                      View Case Study
+                    </ActionButton>
+                    <Button href={proj.github ?? "#"} target="_blank" variant="ghost">
+                      Open GitHub
+                    </Button>
+                    <Button href={proj.live ?? "#"} target="_blank" variant="ghost">
+                      Open Live Site
+                    </Button>
+                    <Button href={proj.details ?? "#"} variant="ghost">
+                      Open Details
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CASE STUDY DRAWER */}
+      <div
+        className={cn("fixed inset-0 z-50 transition-opacity", caseOpen ? "opacity-100" : "pointer-events-none opacity-0")}
+        aria-hidden={!caseOpen}
+      >
+        <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setCaseOpen(false)} />
+        <div
+          className={cn(
+            "absolute right-0 top-0 h-full w-full max-w-xl border-l border-white/10 bg-slate-950/95 shadow-[0_0_60px_rgba(99,102,241,0.25)] transition-transform duration-500",
+            caseOpen ? "translate-x-0" : "translate-x-full"
+          )}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="case-study-title"
+        >
+          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div>
-              <div className="text-xs font-semibold text-white/70">DESCRIPTION</div>
+              <div className="text-xs text-white/60">Case Study</div>
+              <div id="case-study-title" className="text-sm font-semibold text-white">
+                {proj.title} — {proj.subtitle ?? proj.tag}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCaseOpen(false)}
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 hover:bg-white/10"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="h-[calc(100%-60px)] overflow-y-auto px-5 py-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="text-xs font-semibold text-white/70">OVERVIEW</div>
               <p className="mt-2 text-sm leading-relaxed text-white/75">{proj.longDesc}</p>
             </div>
 
-            
-
-            <div>
-              <div className="text-xs font-semibold text-white/70">TECH STACK</div>
-              <div className="mt-3 grid gap-2">
-                {proj.stack.map((s) => (
-                  <div key={s} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <span className="text-sm text-white/80">{s}</span>
-                    <span className="text-xs text-white/50">100%</span>
-                  </div>
-                ))}
+            <div className="mt-4 grid gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-xs font-semibold text-white/70">PROBLEM</div>
+                <p className="mt-2 text-sm text-white/75">{proj.problem}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-xs font-semibold text-white/70">SOLUTION</div>
+                <p className="mt-2 text-sm text-white/75">{proj.solution}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-xs font-semibold text-white/70">TECHNICAL DECISIONS</div>
+                <ul className="mt-2 grid gap-2 text-sm text-white/75">
+                  {proj.decisions.map((d) => (
+                    <li key={d} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                      {d}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-xs font-semibold text-white/70">OUTCOME</div>
+                <p className="mt-2 text-sm text-white/75">{proj.outcome}</p>
               </div>
             </div>
 
-            <div className="grid gap-2">
+            <div className="mt-4 grid gap-2">
               <Button href={proj.github ?? "#"} target="_blank" variant="ghost">
                 Open GitHub
               </Button>
               <Button href={proj.live ?? "#"} target="_blank" variant="ghost">
                 Open Live Site
-              </Button>
-              <Button href={proj.details ?? "#"} variant="primary">
-                Open Details
               </Button>
             </div>
           </div>
@@ -620,20 +1128,67 @@ function Skills() {
     <section id="skills" className="mx-auto max-w-6xl px-5 py-10">
       <div className="mb-6">
         <Pill className="mb-3">Skills</Pill>
-        <h2 className="font-display text-2xl font-extrabold text-white">Skills & Tools</h2>
-        <p className="mt-2 font-body text-sm text-white/70">
-          Technologies I use to build products and experiment with data.
-        </p>
+        <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">Skills & Tools</h2>
+        <p className="mt-2 font-body text-sm text-white/80">Technologies I use to build products and experiment with data.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         {SKILLS.map((g) => (
-          <Glass key={g.group} className="p-6">
+          <Glass key={g.group} className="p-7">
             <div className="text-base font-semibold text-white">{g.group}</div>
             <div className="mt-4 flex flex-wrap gap-2">
               {g.items.map((it) => (
-                <Pill key={it}>{it}</Pill>
+                <SkillBadge key={it} label={it} />
               ))}
+            </div>
+          </Glass>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Writing() {
+  return (
+    <section id="writing" className="mx-auto max-w-6xl px-5 py-10">
+      <div className="mb-6">
+        <Pill className="mb-3">Writing</Pill>
+        <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">Articles & Notes</h2>
+        <p className="mt-2 font-body text-sm text-white/80">
+          Short explanations of my ML experiments, system design decisions, and lessons learned.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {WRITINGS.map((w) => (
+          <Glass key={w.title} className="p-6 transition-transform hover:-translate-y-1 hover:border-white/20">
+            <div className="text-xs text-white/60">{w.outlet}</div>
+            <div className="mt-2 text-sm font-semibold text-white">{w.title}</div>
+            <a href={w.href} className="mt-4 inline-flex text-xs text-fuchsia-200 hover:text-white">
+              Read article
+            </a>
+          </Glass>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section id="testimonials" className="mx-auto max-w-6xl px-5 py-10">
+      <div className="mb-6">
+        <Pill className="mb-3">Social Proof</Pill>
+        <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">What People Say</h2>
+        <p className="mt-2 font-body text-sm text-white/80">Short feedback from collaborators and stakeholders.</p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {TESTIMONIALS.map((t) => (
+          <Glass key={t.quote} className="p-7 transition-transform hover:-translate-y-1 hover:border-white/20">
+            <p className="text-sm text-white/85">“{t.quote}”</p>
+            <div className="mt-4 text-xs text-white/60">
+              {t.author} — {t.role}
             </div>
           </Glass>
         ))}
@@ -681,8 +1236,8 @@ function Contact() {
         <div className="md:col-span-6">
           <Glass className="p-7">
             <Pill className="mb-3">Contact</Pill>
-            <h2 className="font-display text-2xl font-extrabold text-white">Let&apos;s connect</h2>
-            <p className="mt-2 font-body text-sm text-white/70">
+            <h2 className="font-display text-2xl font-extrabold text-white drop-shadow-sm">Let&apos;s connect</h2>
+            <p className="mt-2 font-body text-sm text-white/80">
               Feel free to reach out for internship opportunities, collaborations, or project discussions.
             </p>
 
@@ -718,7 +1273,6 @@ function Contact() {
         <div className="md:col-span-6">
           <Glass className="p-7">
             <div className="text-sm font-semibold text-white">Quick Message</div>
-            
 
             <form
               className="mt-6 grid gap-3"
@@ -804,49 +1358,67 @@ function Footer() {
 }
 
 export default function Page() {
-  const easing: [number, number, number, number] = [0.22, 1, 0.36, 1];
-  const fadeUp = {
-    hidden: { opacity: 0, y: 24 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: easing } },
-  };
-
-  const stagger = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
-  };
-
   return (
     <div className="relative min-h-screen bg-slate-950 text-white">
       <GlowBg />
+      <CursorGlow />
+      <GalaxyAmbient />
+      <ScrollProgress />
+
       <Navbar />
+
+      {/* FULL-WIDTH TOP BANNER (NOT an intro screen) */}
+      <TopBanner />
+
       <main className="relative">
-        <motion.div initial="hidden" animate="show" variants={stagger}>
-          <motion.div variants={fadeUp}>
+        <ParallaxSection className="relative">
+          <ScrollReveal variant="zoom" delay={0.05} className="relative">
             <Hero />
-          </motion.div>
-          <motion.div variants={fadeUp}>
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal variant="slide-right" delay={0.08} className="relative">
             <About />
-          </motion.div>
-          <motion.div variants={fadeUp}>
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal variant="slide-left" delay={0.08} className="relative">
             <Projects />
-          </motion.div>
-          <motion.div variants={fadeUp}>
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal variant="flip" delay={0.08} className="relative">
             <Skills />
-          </motion.div>
-          <motion.div variants={fadeUp}>
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal delay={0.1} className="relative">
+            <Writing />
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal delay={0.1} className="relative">
+            <Testimonials />
+          </ScrollReveal>
+        </ParallaxSection>
+
+        <ParallaxSection className="relative">
+          <ScrollReveal delay={0.1} className="relative">
             <Contact />
-          </motion.div>
-        </motion.div>
+          </ScrollReveal>
+        </ParallaxSection>
       </main>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.7, ease: easing }}
-      >
-        <Footer />
-      </motion.div>
+      <ParallaxSection className="relative">
+        <ScrollReveal delay={0.1} className="relative">
+          <Footer />
+        </ScrollReveal>
+      </ParallaxSection>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Manrope, Sora } from "next/font/google";
+import { Manrope, Cinzel } from "next/font/google";
 import "./globals.css";
 
-const sora = Sora({
+const cinzel = Cinzel({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 const manrope = Manrope({
@@ -15,18 +15,18 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Studio Portfolio",
-  description: "Futuristic portfolio landing page",
+  title: "Adilanh  Portfolio",
+  description: "Software  ML  Data Portfolio",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} ${manrope.variable} antialiased`}>
+      <body className={`${cinzel.variable} ${manrope.variable} antialiased`}>
         {children}
       </body>
     </html>
