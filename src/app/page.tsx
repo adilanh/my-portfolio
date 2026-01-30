@@ -39,6 +39,9 @@ type Project = {
   status?: "In Progress" | "Completed";
 };
 
+const isProd = typeof window !== "undefined" ? window.location.hostname !== "localhost" : process.env.NODE_ENV === "production";
+const prefix = isProd ? "/my-portfolio" : "";
+
 const PROJECTS: Project[] = [
   {
     title: "SIANTAR",
@@ -63,8 +66,8 @@ const PROJECTS: Project[] = [
     ],
     outcome: "Faster lookup, clearer accountability, and a repeatable reporting flow.",
     stack: ["React", "TypeScript", "Tailwind", "REST API", "MySQL"],
-    demoVideo: "/demo/siantar.mp4",
-    poster: "/demo/siantar.jpeg",
+    demoVideo: `${prefix}/demo/siantar.mp4`,
+    poster: `${prefix}/demo/siantar.jpeg`,
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -86,8 +89,8 @@ const PROJECTS: Project[] = [
     decisions: ["Leaflet for lightweight, interactive maps", "GeoJSON for structured spatial data", "Filterable listing synced to map state"],
     outcome: "Clearer location coverage and easier discovery by area or category.",
     stack: ["React", "Leaflet", "GeoJSON"],
-    demoVideo: "/demo/coffeepahoman.mp4",
-    poster: "/demo/coffeepahoman.jpeg",
+    demoVideo: `${prefix}/demo/coffeepahoman.mp4`,
+    poster: `${prefix}/demo/coffeepahoman.jpeg`,
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -109,8 +112,8 @@ const PROJECTS: Project[] = [
     decisions: ["Rule-based inference for transparency", "Symptom-driven input flow", "Explainable outputs over black-box ML"],
     outcome: "Clear decision support that is easy to validate and trust in the field.",
     stack: ["Python", "Expert System", "Rule-based AI"],
-    demoVideo: "/demo/noka.mp4",
-    poster: "/demo/noka.jpeg",
+    demoVideo: `${prefix}/demo/noka.mp4`,
+    poster: `${prefix}/demo/noka.jpeg`,
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -132,8 +135,8 @@ const PROJECTS: Project[] = [
     decisions: ["Authentication to protect submissions", "Ratings to create feedback loops", "Leaderboard for lightweight gamification"],
     outcome: "Higher engagement through clear user flows and visible outcomes.",
     stack: ["React", "Firebase", "Auth"],
-    demoVideo: "/demo/piccrown.mp4",
-    poster: "/demo/piccrown.jpeg",
+    demoVideo: `${prefix}/demo/piccrown.mp4`,
+    poster: `${prefix}/demo/piccrown.jpeg`,
     github: "https://github.com/adilanh",
     live: "#",
     details: "#",
@@ -613,7 +616,7 @@ function Hero() {
               <Button href="#about" variant="ghost">
                 About Me
               </Button>
-              <Button href="/resume.pdf" variant="ghost">
+              <Button href={`${prefix}/resume.pdf`} variant="ghost">
                 Download CV
               </Button>
             </div>
