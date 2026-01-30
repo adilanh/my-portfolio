@@ -39,7 +39,7 @@ type Project = {
   status?: "In Progress" | "Completed";
 };
 
-const isProd = typeof window !== "undefined" ? window.location.hostname !== "localhost" : process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === "production";
 const prefix = isProd ? "/my-portfolio" : "";
 
 const PROJECTS: Project[] = [
