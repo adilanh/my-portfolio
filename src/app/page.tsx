@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import ScrollReveal from "@/components/scroll-reveal";
 import ParallaxSection from "@/components/parallax-section";
 import MagneticButton from "@/components/magnetic-button";
@@ -39,8 +39,7 @@ type Project = {
   status?: "In Progress" | "Completed";
 };
 
-const isProd = process.env.NODE_ENV === "production";
-const prefix = isProd ? "/my-portfolio" : "";
+const prefix = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const PROJECTS: Project[] = [
   {
@@ -453,14 +452,14 @@ function TopBanner() {
     show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
   };
 
-  const letter = {
+  const letter: Variants = {
     hidden: { opacity: 0, x: 46, y: 0, filter: "blur(12px)" },
     show: {
       opacity: 1,
       x: 0,
       y: 0,
       filter: "blur(0px)",
-      transition: { duration: 1.25, ease: [0.12, 0.95, 0.2, 1] },
+      transition: { duration: 1.25, ease: [0.12, 0.95, 0.2, 1] as const },
     },
   };
 
